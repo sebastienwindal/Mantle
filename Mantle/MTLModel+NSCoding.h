@@ -33,13 +33,13 @@ typedef enum : NSUInteger {
 // +propertyKeys.
 //
 // Returns an initialized model object, or nil if a decoding error occurred.
-- (id)initWithCoder:(NSCoder *)coder;
+//- (id)initWithCoder:(NSCoder *)coder;
 
 // Archives the receiver using the given coder.
 //
 // This will encode the receiver's +modelVersion, then the receiver's properties
 // according to the behaviors specified in +encodingBehaviorsByPropertyKey.
-- (void)encodeWithCoder:(NSCoder *)coder;
+//- (void)encodeWithCoder:(NSCoder *)coder;
 
 // Determines how the +propertyKeys of the class are encoded into an archive.
 // The values of this dictionary should be boxed MTLModelEncodingBehavior

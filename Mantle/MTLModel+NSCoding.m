@@ -69,65 +69,6 @@ static NSString * const MTLModelVersionKey = @"MTLModelVersion";
 
 #pragma mark NSCoding
 
-- (instancetype)initWithCoder:(NSCoder *)coder {
-	NSNumber *version = [coder decodeObjectForKey:MTLModelVersionKey];
-	if (version == nil) {
-		NSLog(@"Warning: decoding an archive of %@ without a version, assuming 0", self.class);
-	} else if (version.unsignedIntegerValue > self.class.modelVersion) {
-		// Don't try to decode newer versions.
-		return nil;
-	}
-
-	// Handle the old archive format.
-	NSDictionary *externalRepresentation = [coder decodeObjectForKey:@"externalRepresentation"];
-	if (externalRepresentation != nil) {
-		NSAssert([self.class methodForSelector:@selector(dictionaryValueFromArchivedExternalRepresentation:version:)] != [MTLModel methodForSelector:@selector(dictionaryValueFromArchivedExternalRepresentation:version:)], @"Decoded an old archive of %@ that contains an externalRepresentation, but +dictionaryValueFromArchivedExternalRepresentation:version: is not overridden to handle it", self.class);
-
-		NSDictionary *dictionaryValue = [self.class dictionaryValueFromArchivedExternalRepresentation:externalRepresentation version:version.unsignedIntegerValue];
-		if (dictionaryValue == nil) return nil;
-
-		return [self initWithDictionary:dictionaryValue];
-	}
-
-	NSSet *propertyKeys = self.class.propertyKeys;
-	NSMutableDictionary *dictionaryValue = [[NSMutableDictionary alloc] initWithCapacity:propertyKeys.count];
-
-	for (NSString *key in propertyKeys) {
-		id value = [self decodeValueForKey:key withCoder:coder modelVersion:version.unsignedIntegerValue];
-		if (value == nil) continue;
-
-		dictionaryValue[key] = value;
-	}
-
-	return [self initWithDictionary:dictionaryValue];
-}
-
-- (void)encodeWithCoder:(NSCoder *)coder {
-	[coder encodeObject:@(self.class.modelVersion) forKey:MTLModelVersionKey];
-
-	NSDictionary *encodingBehaviors = self.class.encodingBehaviorsByPropertyKey;
-	[self.dictionaryValue enumerateKeysAndObjectsUsingBlock:^(NSString *key, id value, BOOL *stop) {
-		// Skip nil values.
-		if ([value isEqual:NSNull.null]) return;
-
-		switch ([encodingBehaviors[key] unsignedIntegerValue]) {
-			// This will also match a nil behavior.
-			case MTLModelEncodingBehaviorExcluded:
-				break;
-
-			case MTLModelEncodingBehaviorUnconditional:
-				[coder encodeObject:value forKey:key];
-				break;
-
-			case MTLModelEncodingBehaviorConditional:
-				[coder encodeConditionalObject:value forKey:key];
-				break;
-
-			default:
-				NSAssert(NO, @"Unrecognized encoding behavior %@ for key \"%@\"", encodingBehaviors[key], key);
-		}
-	}];
-}
 
 @end
 

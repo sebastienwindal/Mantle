@@ -102,7 +102,7 @@
 // The version of this MTLModel subclass.
 //
 // Returns 0.
-+ (NSUInteger)modelVersion;
+//+ (NSUInteger)modelVersion;
 
 // Migrates an external representation from an older model version. This method
 // will be invoked from -initWithCoder: if an older version of the receiver is
