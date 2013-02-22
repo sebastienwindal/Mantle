@@ -7,6 +7,9 @@
 //
 
 #import <Foundation/Foundation.h>
+#ifndef _Sdfsdf_Sdfsdf_
+#define _Sdfsdf_Sdfsdf_
+
 
 //
 // An abstract base class for model objects, using reflection to provide
@@ -124,3 +127,5 @@
 - (void)mergeValuesForKeysFromModel:(MTLModel *)model;
 
 @end
+
+#endif
